@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Amigo Secreto 🎁</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎁 Amigo Secreto</h1>
+    <p>Escribe el nombre exacto de tu amigo secreto:</p>
+
+    <div class="busqueda">
+      <input type="text" id="nombre" placeholder="Ej: María, Juan, etc.">
+      <button onclick="buscar()">Buscar</button>
+    </div>
+
+    <div class="tabla-container">
+        <div id="resultado"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const URL = "https://docs.google.com/spreadsheets/d/1vScNht0b6dPC0qpWbiTfq72m6cqaA3FrBhnbxuvSKqw/gviz/tq?tqx=out:json";
+
+    async function buscar() {
+      const nombre = document.getElementById("nombre").value.toLowerCase();
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "⏳ Buscando...";
+
+      const res = await fetch(URL);
+      const text = await res.text();
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+      const filas = json.table.rows;
+
+      const encontrado = filas.find(f =>
+        f.c[1]?.v?.toLowerCase() === nombre
+      );
+
+      if (!encontrado) {
+        resultado.innerHTML = "❌ No se encontró a esa persona.";
+        return;
+      }
+
+      const columnas = json.table.cols;
+      let tabla = `<table><tr>`;
+
+      columnas.forEach(col => {
+        if (col.label !== "Marca temporal") {
+          tabla += `<th>${col.label}</th>`;
+        }
+      });
+
+      tabla += "</tr><tr>";
+
+      encontrado.c.forEach((celda, index) => {
+        if (index !== 0) {
+          tabla += `<td>${celda ? celda.v : ""}</td>`;
+        }
+      });
+
+      tabla += "</tr></table>";
+      resultado.innerHTML = tabla;
+    }
+  </script>
+
+</body>
+</html>
