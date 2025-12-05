@@ -26,7 +26,7 @@
     const URL = "https://docs.google.com/spreadsheets/d/1vScNht0b6dPC0qpWbiTfq72m6cqaA3FrBhnbxuvSKqw/gviz/tq?tqx=out:json";
 
     async function buscar() {
-      const nombre = document.getElementById("nombre").value.toLowerCase();
+      const nombre = document.getElementById("nombre").value.trim().toLowerCase();
       const resultado = document.getElementById("resultado");
       resultado.innerHTML = "⏳ Buscando...";
 
@@ -36,8 +36,9 @@
       const filas = json.table.rows;
 
       const encontrado = filas.find(f =>
-        f.c[1]?.v?.toLowerCase() === nombre
+        f.c[1]?.v?.toLowerCase().includes(nombre)
       );
+
 
       if (!encontrado) {
         resultado.innerHTML = "❌ No se encontró a esa persona.";
